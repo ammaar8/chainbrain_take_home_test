@@ -32,29 +32,30 @@ connection_keys_minio = dict(
 storage = StorageSession()
 
 # Set storage
-storage.setStorage("minio", connection_keys_minio)
+success = storage.setStorage("minio", connection_keys_minio)
 
-# Get dataset
-birthdays_table = storage.getDataset("birthdays.parquet")
-print(" ------------ Read Arrow Table ---------------")
-print(birthdays_table)
+if success == "Connection Succeded":
+    # Get dataset
+    birthdays_table = storage.getDataset("birthdays.parquet")
+    print(" ------------ Read Arrow Table ---------------")
+    print(birthdays_table)
 
-# Convert to pandas df
-birthdays_df = birthdays_table.to_pandas()
-print(" ------------ Read DataFrame ---------------")
-print(birthdays_df)
+    # Convert to pandas df
+    birthdays_df = birthdays_table.to_pandas()
+    print(" ------------ Read DataFrame ---------------")
+    print(birthdays_df)
 
-# Filter dataset
-processed_birthdays_df = birthdays_df[birthdays_df["years"] >= 2000]
-print(" ------------ Processed DataFrame ---------------")
-print(processed_birthdays_df)
+    # Filter dataset
+    processed_birthdays_df = birthdays_df[birthdays_df["years"] >= 2000]
+    print(" ------------ Processed DataFrame ---------------")
+    print(processed_birthdays_df)
 
-# write dataset back to storage
-processed_birthdays_table = pa.Table.from_pandas(processed_birthdays_df)
-print(" ------------ Processed Dataset as Arrow Table ---------------")
-print(processed_birthdays_table)
-storage.writeDataset("processed_birthdays.parquet", processed_birthdays_table)
+    # write dataset back to storage
+    processed_birthdays_table = pa.Table.from_pandas(processed_birthdays_df)
+    print(" ------------ Processed Dataset as Arrow Table ---------------")
+    print(processed_birthdays_table)
+    storage.writeDataset("processed_birthdays.parquet", processed_birthdays_table)
 
-# read processed dataset from storage
-print(" ------------ Processed Dataset Read From Storage---------------")
-print(storage.getDataset("processed_birthdays.parquet"))
+    # read processed dataset from storage
+    print(" ------------ Processed Dataset Read From Storage---------------")
+    print(storage.getDataset("processed_birthdays.parquet"))

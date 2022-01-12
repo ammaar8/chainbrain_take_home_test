@@ -9,19 +9,13 @@ class StorageHandler_Minio(StorageHandler):
     """Handles reading and writing datasets to Minio for StorageSession."""
 
     def __init__(self) -> None:
-        super().__init__()
-
-    def check_keys(self, connection_keys) -> bool:
-        """Checks if all the required keys are present in the provided keys
-        for the given provider.
-
-        """
-        required_keys = [
-            "endpoint",
-            "access_key",
-            "secret_key",
-        ]
-        return super().check_keys(required_keys, connection_keys)
+        super().__init__(
+            required_keys=[
+                "endpoint",
+                "access_key",
+                "secret_key",
+            ],
+        )
 
     def check_connection(self, connection_keys) -> bool:
         """Test connection with given keys to make sure connection can be made."""
@@ -49,7 +43,7 @@ class StorageHandler_Minio(StorageHandler):
         """
         client = Minio(**connection_keys)
         response = client.get_object(bucket, filename)
-        dataset = super().parquetToObject(response.data)
+        dataset = self.parquetToObject(response.data)
         return dataset
 
     def writeDataset(self, filename, data_object, connection_keys, bucket):
@@ -67,7 +61,7 @@ class StorageHandler_Minio(StorageHandler):
 
         """
         try:
-            parquetObj = super().objectToParquet(data_object)
+            parquetObj = self.objectToParquet(data_object)
             parquetObj.seek(0)
             client = Minio(**connection_keys)
             length = parquetObj.getbuffer().nbytes

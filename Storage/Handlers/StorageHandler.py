@@ -8,6 +8,9 @@ class StorageHandler:
     Base class for StorageHandlers for different storage providers.
     """
 
+    def __init__(self, required_keys) -> None:
+        self.__required_keys = required_keys
+
     def objectToParquet(self, data_object) -> BytesIO:
         """
         Converts arrow table object to parquet file for writing to storage.
@@ -36,20 +39,19 @@ class StorageHandler:
         data_object = pq.read_table(BytesIO(file))
         return data_object
 
-    def check_keys(self, required_keys, connection_keys) -> bool:
+    def check_keys(self, connection_keys) -> bool:
         """
         Checks if all required keys are present in keys provided.
 
         Args:
-            required_keys: List of strings which are required for provider.
             connection_keys: List of strings provided to the Handler.
 
         Return:
             True or False.
         """
-        provided_keys = connection_keys.keys()
-        for k in required_keys:
+        provided_keys = list(connection_keys.keys())
+        for k in self.__required_keys:
             if k not in provided_keys:
                 return False
-            else:
-                return True
+
+        return True
